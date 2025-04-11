@@ -55,8 +55,7 @@ LABEL name="RHTAP backstage plugins" \
       description="Artifact with Backstage plugins for RHTAP" \
       summary="Artifact with Backstage plugins for RHTAP" \
       url="https://github.com/redhat-appstudio/backstage-community-plugins" \
-      distribution-scope="public" \
-      io.backstage.dynamic-packages="$BASE64_HASH"
+      distribution-scope="public"
 
 COPY --chown=1001:1001 --from=builder /plugin-output /
 
