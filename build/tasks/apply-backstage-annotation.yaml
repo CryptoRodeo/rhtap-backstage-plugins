@@ -89,10 +89,11 @@ spec:
         cat updated-manifest.json > $(workspaces.manifest-data.path)/manifest.json
 
     - name: upload-backstage-annotation
-      image: quay.io/konflux-ci/oras:latest@sha256:d9fea2ee280880feef6909bef3e18318444231c83736bcc41d54b4e5064f23c9
+      image: quay.io/konflux-ci/oras:latest@sha256:8d756a91aae1fa5186efafee056446bb5e77228cf5ad9a7ae0e3f8d727da50cd
+      workingDir: /var/workdir
       script: |
-        #!/bin/bash
-        set -e
+        set -eu
+        set -o pipefail
 
         echo "Selecting OCI auth..."
         TEST_IMAGE_NO_SHA=quay.io/redhat-user-workloads/rhtap-shared-team-tenant/rhtap-backstage-plugins:on-pr-969d69a71f6f903bd16171b4d46330242f7b4a0d
