@@ -97,10 +97,11 @@ spec:
 
         echo "Selecting OCI auth..."
         TEST_IMAGE_NO_SHA=quay.io/redhat-user-workloads/rhtap-shared-team-tenant/rhtap-backstage-plugins:on-pr-969d69a71f6f903bd16171b4d46330242f7b4a0d
+        AUTH_FILE="$(workspaces.manifest-data.path)/auth.json"
         # Change to "$(params.IMAGE_URL)"
-        select-oci-auth "$TEST_IMAGE_NO_SHA" > auth.json
+        select-oci-auth "$TEST_IMAGE_NO_SHA" > "$AUTH_FILE"
 
         # Attempt to push the new manifest
         echo "Attempting push..."
         # Change to "$(params.IMAGE_URL)"
-        oras manifest push "$TEST_IMAGE_NO_SHA" $(workspaces.manifest-data.path)/manifest.json --registry-config auth.json && echo "Push Succeeded!"
+        oras manifest push "$TEST_IMAGE_NO_SHA" $(workspaces.manifest-data.path)/manifest.json --registry-config "$AUTH_FILE" && echo "Push Succeeded!"
