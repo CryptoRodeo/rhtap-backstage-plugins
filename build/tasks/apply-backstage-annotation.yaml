@@ -89,7 +89,7 @@ spec:
         cat updated-manifest.json > $(workspaces.manifest-data.path)/manifest.json
 
     - name: upload-backstage-annotation
-      image: quay.io/konflux-ci/yq:latest@sha256:93bb15cff64b708263055a5814b24a0b450d8724b86a7e5206396f25d81fcc21
+      image: quay.io/konflux-ci/oras:latest@sha256:d9fea2ee280880feef6909bef3e18318444231c83736bcc41d54b4e5064f23c9
       script: |
         #!/bin/bash
         set -e
