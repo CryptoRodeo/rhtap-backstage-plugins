@@ -13,11 +13,12 @@ spec:
     - name: IMAGE_DIGEST
       type: string
       description: The digest of the image
+  workspaces:
+    - name: backstage-manifest-data
+      description: Workspace for passing the new manifest.json file
   steps:
-    - name: apply-backstage-annotation
-      #image: registry.access.redhat.com/ubi8/ubi-minimal:latest
-      # test oras image for this
-      image: quay.io/konflux-ci/yq:latest@sha256:93bb15cff64b708263055a5814b24a0b450d8724b86a7e5206396f25d81fcc21
+    - name: generate-backstage-annotation
+      image: registry.access.redhat.com/ubi8/ubi-minimal:latest
       script: |
         #!/bin/bash
         set -e
@@ -82,12 +83,20 @@ spec:
         # Debug log
         echo "Updated manifest:"
         cat updated-manifest.json | jq
+
+        echo "Uploading manifest to shared workspace"
         # Update the original manifest.json file with the new definition
-        cat updated-manifest.json > manifest.json
+        cat updated-manifest.json > $(workspaces.backstage-manifest-data.path)/manifest.json
+
+    - name: upload-backstage-annotation
+      image: quay.io/konflux-ci/yq:latest@sha256:93bb15cff64b708263055a5814b24a0b450d8724b86a7e5206396f25d81fcc21
+      script: |
+        #!/bin/bash
+        set -e
 
         echo "Selecting OCI auth"
         select-oci-auth "$(params.IMAGE_URL)" > auth.json
 
         # Attempt to push the new manifest
         echo "Attempting push..."
-        oras manifest push "$TEST_IMAGE_NO_SHA" manifest.json --registry-config auth.json && echo "Push Succeeded!"
+        oras manifest push "$TEST_IMAGE_NO_SHA" $(workspaces.backstage-manifest-data.path)/manifest.json --registry-config auth.json && echo "Push Succeeded!"
