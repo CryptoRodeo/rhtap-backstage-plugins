@@ -616,7 +616,7 @@ spec:
             - name: name
               value: apply-backstage-annotation
             - name: bundle
-              value: quay.io/bramos/task-apply-backstage-annotation@sha256:8c027e33c10295658fe967ee15a54891ff14a205fc3725faaf214ab0ebd40136
+              value: quay.io/bramos/task-apply-backstage-annotation@sha256:26f991a45a5a1faa7d6cd3fa33dd51753f7a3ba6d5445cf2323b4f949dc5a7b2
             - name: kind
               value: task
           resolver: bundles

@@ -80,7 +80,9 @@ spec:
         # Debug log
         echo "Updated manifest:"
         cat updated-manifest.json | jq
+        # Update the original manifest.json file with the new definition
+        cat updated-manifest.json > manifest.json
 
         # Attempt to push the new manifest
         echo "Attempting push..."
-        oras manifest push "$TEST_IMAGE_NO_SHA" updated-manifest.json && echo "Push Succeeded!"
+        oras manifest push "$TEST_IMAGE_NO_SHA" manifest.json && echo "Push Succeeded!"
