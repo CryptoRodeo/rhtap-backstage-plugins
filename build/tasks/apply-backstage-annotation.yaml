@@ -83,6 +83,9 @@ spec:
         # Update the original manifest.json file with the new definition
         cat updated-manifest.json > manifest.json
 
+        echo "Attempt login"
+        podman login quay.io
+
         # Attempt to push the new manifest
         echo "Attempting push..."
         oras manifest push "$TEST_IMAGE_NO_SHA" manifest.json && echo "Push Succeeded!"
