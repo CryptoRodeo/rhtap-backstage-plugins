@@ -616,7 +616,7 @@ spec:
             - name: name
               value: apply-backstage-annotation
             - name: bundle
-              value: quay.io/bramos/task-apply-backstage-annotation@sha256:5ec0e00e70e7ab758337a952d3e1bbda01b275d713a5547fc8780f54710e39b1
+              value: quay.io/bramos/task-apply-backstage-annotation@sha256:aa713dccd48c1fcbb4fff1a81205c98ffd6c41cd46b5c2697be9dcdc094e1e1d
             - name: kind
               value: task
           resolver: bundles
@@ -626,18 +626,20 @@ spec:
             values:
               - "false"
         workspaces:
-          - name: backstage-manifest-data
-            emptyDir: {}
+          - name: manifest-data
+            workspace: backstage-manifest-data
     workspaces:
       - name: git-auth
         optional: true
       - name: netrc
         optional: true
       - name: backstage-manifest-data
-        optional: true
+        optional: false
   taskRunTemplate: {}
   workspaces:
     - name: git-auth
       secret:
         secretName: "{{ git_auth_secret }}"
+    - name: backstage-manifest-data
+      emptyDir: {}
 status: {}
