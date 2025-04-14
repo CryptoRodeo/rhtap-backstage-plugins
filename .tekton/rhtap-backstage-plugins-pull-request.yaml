@@ -633,6 +633,8 @@ spec:
         optional: true
       - name: netrc
         optional: true
+      - name: backstage-manifest-data
+        optional: true
   taskRunTemplate: {}
   workspaces:
     - name: git-auth
