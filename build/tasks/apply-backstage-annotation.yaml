@@ -15,7 +15,9 @@ spec:
       description: The digest of the image
   steps:
     - name: apply-backstage-annotation
-      image: registry.access.redhat.com/ubi8/ubi-minimal:latest
+      #image: registry.access.redhat.com/ubi8/ubi-minimal:latest
+      # test oras image for this
+      image: quay.io/konflux-ci/yq:latest@sha256:93bb15cff64b708263055a5814b24a0b450d8724b86a7e5206396f25d81fcc21
       script: |
         #!/bin/bash
         set -e
@@ -83,9 +85,9 @@ spec:
         # Update the original manifest.json file with the new definition
         cat updated-manifest.json > manifest.json
 
-        echo "Attempt login"
-        podman login quay.io
+        echo "Selecting OCI auth"
+        select-oci-auth $(params.IMAGE_URL) > auth.json
 
         # Attempt to push the new manifest
         echo "Attempting push..."
-        oras manifest push "$TEST_IMAGE_NO_SHA" manifest.json && echo "Push Succeeded!"
+        oras manifest push "$TEST_IMAGE_NO_SHA" manifest.json --registry-config auth.json && echo "Push Succeeded!"
