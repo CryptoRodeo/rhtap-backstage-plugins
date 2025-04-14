@@ -86,7 +86,7 @@ spec:
         cat updated-manifest.json > manifest.json
 
         echo "Selecting OCI auth"
-        select-oci-auth $(params.IMAGE_URL) > auth.json
+        select-oci-auth "$(params.IMAGE_URL)" > auth.json
 
         # Attempt to push the new manifest
         echo "Attempting push..."
