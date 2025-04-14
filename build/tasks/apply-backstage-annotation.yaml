@@ -45,7 +45,7 @@ spec:
         tar -zxf oras_${VERSION}_*.tar.gz -C oras-install/
         mv oras-install/oras /usr/local/bin/
         rm -rf oras_${VERSION}_*.tar.gz oras-install/
-       
+
         # Pull the image using ORAS
         echo "Pulling blobs with ORAS..."
         # Christophe's WIP image
@@ -94,7 +94,7 @@ spec:
         #!/bin/bash
         set -e
 
-        echo "Selecting OCI auth"
+        echo "Selecting OCI auth..."
         TEST_IMAGE_NO_SHA=quay.io/redhat-user-workloads/rhtap-shared-team-tenant/rhtap-backstage-plugins:on-pr-969d69a71f6f903bd16171b4d46330242f7b4a0d
         # Change to "$(params.IMAGE_URL)"
         select-oci-auth "$TEST_IMAGE_NO_SHA" > auth.json
