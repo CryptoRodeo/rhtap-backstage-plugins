@@ -231,7 +231,23 @@ spec:
             value: |
               #!/bin/bash
               ls -a
+              ENV PLUGINS_OUTPUT="/plugin-output"
+              ENV PLUGINS_WORKSPACE="/plugin-workspace"
 
+              yarn plugins:prepare && \
+              yarn plugins:build:frontend && \
+              yarn plugins:build:backend && \
+              yarn plugins:build:backend:postinstall && \
+              yarn plugins:package
+
+              for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
+                   mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
+                   cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
+                 done && \
+              jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
+              rm -f ${PLUGINS_OUTPUT}/*-index.json
+
+              cat ${PLUGINS_OUTPUT}/index.json
               echo "test-annotation=worked"
 #              INDEX_BASE64=$(base64 -w 0 deploy/index.json)
 #              echo -n "io.backstage.dynamic-packages=$INDEX_BASE64" > "${SCRIPT_OUTPUT}"
