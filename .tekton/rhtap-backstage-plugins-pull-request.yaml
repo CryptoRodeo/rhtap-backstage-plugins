@@ -219,53 +219,39 @@ spec:
             workspace: git-auth
           - name: netrc
             workspace: netrc
-      #      - name: build-dynamic-plugins
-      #        params:
-      #          - name: ociStorage
-      #            value: $(params.output-image).script
-      #          - name: ociArtifactExpiresAfter
-      #            value: $(params.image-expires-after)
-      #          - name: SCRIPT_RUNNER_IMAGE
-      #            value: registry.redhat.io/rhel9/nodejs-20:latest
-      #          - name: SCRIPT
-      #            value: |
-      #              #!/bin/bash
-      #              ls -a
-      #              ENV PLUGINS_OUTPUT="/plugin-output"
-      #              ENV PLUGINS_WORKSPACE="/plugin-workspace"
-      #
-      #              yarn plugins:prepare && \
-      #              yarn plugins:build:frontend && \
-      #              yarn plugins:build:backend && \
-      #              yarn plugins:build:backend:postinstall && \
-      #              yarn plugins:package
-      #
-      #              for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
-      #                   mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
-      #                   cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
-      #                 done && \
-      #              jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
-      #              rm -f ${PLUGINS_OUTPUT}/*-index.json
-      #
-      #              cat ${PLUGINS_OUTPUT}/index.json
-      #              echo "test-annotation=worked"
-      ##              INDEX_BASE64=$(base64 -w 0 deploy/index.json)
-      ##              echo -n "io.backstage.dynamic-packages=$INDEX_BASE64" > "${SCRIPT_OUTPUT}"
-      #          - name: HERMETIC
-      #            value: $(params.hermetic)
-      #          - name: SOURCE_ARTIFACT
-      #            value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-      #        runAfter:
-      #        - prefetch-dependencies
-      #        taskRef:
-      #          params:
-      #          - name: name
-      #            value: run-script-oci-ta
-      #          - name: bundle
-      #            value: quay.io/konflux-ci/tekton-catalog/task-run-script-oci-ta:0.1@sha256:c0f627069353ebd6d1ed03c8657e281eaf11be63706ea38cc53caf16cf4ffd65
-      #          - name: kind
-      #            value: task
-      #          resolver: bundles
+      - name: build-dynamic-plugins
+        params:
+          - name: ociStorage
+            value: $(params.output-image).script
+          - name: ociArtifactExpiresAfter
+            value: $(params.image-expires-after)
+          - name: SCRIPT_RUNNER_IMAGE
+            value: registry.redhat.io/rhel9/nodejs-20:latest
+          - name: SCRIPT
+            value: |
+              #!/bin/bash
+              ls -a
+              which dnf
+              which jq
+              which yarn
+              which node
+              which corepack
+              echo -n "io.backstage.dynamic-packages=test"
+          - name: HERMETIC
+            value: $(params.hermetic)
+          - name: SOURCE_ARTIFACT
+            value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+        runAfter:
+        - prefetch-dependencies
+        taskRef:
+          params:
+          - name: name
+            value: run-script-oci-ta
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-run-script-oci-ta:0.1@sha256:c0f627069353ebd6d1ed03c8657e281eaf11be63706ea38cc53caf16cf4ffd65
+          - name: kind
+            value: task
+          resolver: bundles
       - name: build-container
         params:
           - name: IMAGE
