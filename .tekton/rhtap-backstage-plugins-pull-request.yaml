@@ -244,6 +244,8 @@ spec:
             value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
           - name: CACHI2_ARTIFACT
             value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
+          - name: ANNOTATIONS
+            value: ["test-annotation=it-worked"]
         runAfter:
           - prefetch-dependencies
         taskRef:
@@ -616,7 +618,7 @@ spec:
             - name: name
               value: apply-backstage-annotation
             - name: bundle
-              value: quay.io/bramos/task-apply-backstage-annotation@sha256:f08208bc58481a111e5e874fed160399bd6288e76c068e04155d8042cf763392
+              value: quay.io/bramos/task-apply-backstage-annotation@sha256:985a36913b1e6cd03f187879adb47b2a32f93826a808492332d6cce78a7a7521
             - name: kind
               value: task
           resolver: bundles

@@ -4,8 +4,8 @@ metadata:
   name: apply-backstage-annotation
 spec:
   description: |
-    Retrieves the OCI manifest for the RHTAP plugins, generates a Base64 hash from the contents in index.json 
-    and applies the annotation 'io.backstage.dynamic-packages' with the value being the hash.
+    Retrieves the contents of the RHTAP plugins from the container repository, base64 encodes the index.json file
+    and then adds that hash to the OCI manifest under the annotation "io.backstage.dynamic-packages".
   params:
     - name: IMAGE_URL
       type: string
@@ -49,10 +49,12 @@ spec:
         # Pull the image using ORAS
         echo "Pulling blobs with ORAS..."
         # Christophe's WIP image
+        # Change to: oras blob fetch "$(params.IMAGE_URL)@$(params.IMAGE_DIGEST)" -o layers.tar.gz
         oras blob fetch "$TEST_IMAGE" -o layers.tar.gz
         echo "Eventually will be: oras blob fetch $(params.IMAGE_URL)@$(params.IMAGE_DIGEST) -o layers.tar.gz"
 
         # Extract the files
+        echo "Extracting files..."
         mkdir artifact-contents && tar -xvf layers.tar.gz -C artifact-contents
 
         # Find all index.json files
@@ -81,10 +83,10 @@ spec:
         jq --arg hash "$BASE64_HASH" '.annotations += {"io.backstage.dynamic-packages": $hash}' manifest.json > updated-manifest.json
 
         # Debug log
-        echo "Updated manifest:"
+        echo "DEBUG - Updated manifest..."
         cat updated-manifest.json | jq
 
-        echo "Uploading manifest to shared workspace"
+        echo "Uploading manifest to shared workspace..."
         # Update the original manifest.json file with the new definition
         cat updated-manifest.json > $(workspaces.manifest-data.path)/manifest.json
 
