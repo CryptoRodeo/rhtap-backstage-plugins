@@ -219,6 +219,43 @@ spec:
             workspace: git-auth
           - name: netrc
             workspace: netrc
+
+      - name: build-dynamic-plugins
+        params:
+          - name: ociStorage
+            value: $(params.output-image).script
+          - name: ociArtifactExpiresAfter
+            value: $(params.image-expires-after)
+          - name: SCRIPT_RUNNER_IMAGE
+            value: registry.redhat.io/rhel9/nodejs-20:latest
+          - name: SCRIPT_ARTIFACT_RELATIVE_PATH
+            value: deploy
+          - name: SCRIPT
+            value: |
+              #!/bin/bash
+              export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+              npm install --global corepack
+              yarn install
+              yarn tsc
+              yarn build
+              yarn export-local
+              INDEX_BASE64=$(base64 -w 0 deploy/index.json)
+              echo -n "io.backstage.dynamic-packages=$INDEX_BASE64" > "${SCRIPT_OUTPUT}"
+          - name: HERMETIC
+            value: $(params.hermetic)
+          - name: SOURCE_ARTIFACT
+            value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+        runAfter:
+        - prefetch-dependencies
+        taskRef:
+          params:
+          - name: name
+            value: run-script-oci-ta
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-run-script-oci-ta:0.1@sha256:c0f627069353ebd6d1ed03c8657e281eaf11be63706ea38cc53caf16cf4ffd65
+          - name: kind
+            value: task
+          resolver: bundles
       - name: build-container
         params:
           - name: IMAGE
@@ -245,9 +282,10 @@ spec:
           - name: CACHI2_ARTIFACT
             value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
           - name: ANNOTATIONS
-            value: ["test-annotation=it-worked"]
+            value:
+              - $(tasks.build-dynamic-plugins.results.SCRIPT_OUTPUT)
         runAfter:
-          - prefetch-dependencies
+          - build-dynamic-plugins
         taskRef:
           params:
             - name: name
