@@ -233,8 +233,10 @@ spec:
               PLUGINS_OUTPUT="/plugin-output"
               PLUGINS_WORKSPACE="/plugin-workspace"
 
+              echo "Installing jq"
               dnf install -y jq
 
+              echo "Node setup"
               node --version && \
               npm install -g corepack && \
               corepack --version && \
@@ -243,9 +245,11 @@ spec:
               yarn --version && \
               mkdir -p $PLUGINS_OUTPUT
 
+              echo "yarn plugin scripts"
               yarn plugins:prepare && \
               yarn plugins:build
 
+              echo "Plugin loop"
               for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
                 mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
                 cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
@@ -253,6 +257,7 @@ spec:
               jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
               rm -f ${PLUGINS_OUTPUT}/*-index.json
 
+              echo "Generating hash"
               BASE64_HASH = $(base64 -w 0 ${PLUGINS_OUTPUT}/index.json)
               echo $BASE64_HASH
               echo -n "io.backstage.dynamic-packages=$BASE65_HASH"
@@ -296,11 +301,11 @@ spec:
             value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
           - name: CACHI2_ARTIFACT
             value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
-          #          - name: ANNOTATIONS
-          #            value:
-          #              - $(tasks.build-dynamic-plugins.results.SCRIPT_OUTPUT)
+          - name: ANNOTATIONS
+            value:
+              - $(tasks.build-dynamic-plugins.results.SCRIPT_OUTPUT)
         runAfter:
-          - prefetch-dependencies
+          - build-dynamic-plugins
         taskRef:
           params:
             - name: name
