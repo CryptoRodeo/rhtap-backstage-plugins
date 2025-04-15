@@ -230,37 +230,39 @@ spec:
           - name: SCRIPT
             value: |
               #!/bin/bash
+              set -e
               PLUGINS_OUTPUT="/plugin-output"
               PLUGINS_WORKSPACE="/plugin-workspace"
 
               echo "Installing jq"
               dnf install -y jq
+              ls -a
+              ls $PLUGINS_WORKSPACE
+              #echo "Node setup"
+              #node --version && \
+              #npm install -g corepack && \
+              #corepack --version && \
+              #corepack enable yarn && \
+              #corepack use 'yarn@4' && \
+              #yarn --version && \
+              #mkdir -p $PLUGINS_OUTPUT
 
-              echo "Node setup"
-              node --version && \
-              npm install -g corepack && \
-              corepack --version && \
-              corepack enable yarn && \
-              corepack use 'yarn@4' && \
-              yarn --version && \
-              mkdir -p $PLUGINS_OUTPUT
+              #echo "yarn plugin scripts"
+              #yarn plugins:prepare && \
+              #yarn plugins:build
 
-              echo "yarn plugin scripts"
-              yarn plugins:prepare && \
-              yarn plugins:build
+              #echo "Plugin loop"
+              #for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
+              #  mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
+              #  cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
+              #done && \
+              #jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
+              #rm -f ${PLUGINS_OUTPUT}/*-index.json
 
-              echo "Plugin loop"
-              for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
-                mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
-                cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
-              done && \
-              jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
-              rm -f ${PLUGINS_OUTPUT}/*-index.json
-
-              echo "Generating hash"
-              BASE64_HASH = $(base64 -w 0 ${PLUGINS_OUTPUT}/index.json)
-              echo $BASE64_HASH
-              echo -n "io.backstage.dynamic-packages=$BASE65_HASH"
+              #echo "Generating hash"
+              #BASE64_HASH = $(base64 -w 0 ${PLUGINS_OUTPUT}/index.json)
+              #echo $BASE64_HASH
+              #echo -n "io.backstage.dynamic-packages=$BASE65_HASH"
           - name: HERMETIC
             value: $(params.hermetic)
           - name: SOURCE_ARTIFACT
