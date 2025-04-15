@@ -191,8 +191,6 @@ spec:
         workspaces:
           - name: basic-auth
             workspace: git-auth
-          - name: plugins-dir
-            workspace: build-plugins-ws
       - name: prefetch-dependencies
         params:
           - name: input
@@ -254,9 +252,6 @@ spec:
           - name: kind
             value: task
           resolver: bundles
-        workspaces:
-          - name: build-plugins
-            workspace: build-plugins-ws
       - name: build-container
         params:
           - name: IMAGE
@@ -682,7 +677,5 @@ spec:
       secret:
         secretName: "{{ git_auth_secret }}"
     - name: backstage-manifest-data
-      emptyDir: {}
-    - name: build-plugins-ws
       emptyDir: {}
 status: {}
