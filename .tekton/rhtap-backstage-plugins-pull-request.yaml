@@ -231,33 +231,38 @@ spec:
             value: |
               #!/bin/bash
               set -e
-              PLUGINS_OUTPUT="/plugin-output"
-              PLUGINS_WORKSPACE="/plugin-workspace"
 
-              echo "Installing jq"
-              dnf install -y jq
-              echo "Node setup"
-              node --version && \
-              npm install -g corepack && \
-              corepack --version && \
-              corepack enable yarn && \
-              corepack use 'yarn@4' && \
-              yarn --version && \
+              echo "Setup"
+              PLUGINS_OUTPUT="/plugin-output"          
+              PLUGINS_WORKSPACE="/plugin-workspace"    
+              TURBO_TELEMETRY_DISABLED=1               
+              sure using local headers. (nodejs-devel) 
+              npm_config_nodedir=/usr                  
+              NODE_GYP_FORCE_LOCAL=true                
+              ln -s $PLUGINS_WORKSPACE/.yarn/releases/yarn-4.8.1.cjs /usr/local/bin/yarn
+
+              echo "Installing + setup"
+              dnf module enable nodejs:20 && \
+              dnf install -y jq nodejs-devel && \
+              yarn install --inline-builds && \
               mkdir -p $PLUGINS_OUTPUT && \
               mkdir -p $PLUGINS_WORKSPACE
 
-              echo "yarn plugin scripts"
+              echo "Running yarn scripts"
               yarn plugins:prepare && \
-              yarn plugins:build
+              yarn plugins:build:frontend && \
+              yarn plugins:build:backend && \
+              yarn plugins:build:backend:postinstall && \
+              yarn plugins:package
 
-              echo "Plugin loop"
+              echo "Looping through the plugin files"
               for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
                 mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
                 cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
               done && \
               jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
               rm -f ${PLUGINS_OUTPUT}/*-index.json
-
+              
               echo "Generating hash"
               BASE64_HASH = $(base64 -w 0 ${PLUGINS_OUTPUT}/index.json)
               echo $BASE64_HASH
