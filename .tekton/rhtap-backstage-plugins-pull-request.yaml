@@ -226,7 +226,7 @@ spec:
           - name: ociArtifactExpiresAfter
             value: $(params.image-expires-after)
           - name: SCRIPT_RUNNER_IMAGE
-            value: registry.redhat.io/rhel9/nodejs-20:latest
+            value: registry.redhat.io/ubi9/nodejs-20:latest
           - name: SCRIPT
             value: |
               #!/bin/bash
