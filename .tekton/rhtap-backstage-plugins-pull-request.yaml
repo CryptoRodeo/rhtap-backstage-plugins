@@ -219,7 +219,6 @@ spec:
             workspace: git-auth
           - name: netrc
             workspace: netrc
-
       - name: build-dynamic-plugins
         params:
           - name: ociStorage
@@ -233,14 +232,11 @@ spec:
           - name: SCRIPT
             value: |
               #!/bin/bash
-              export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-              npm install --global corepack
-              yarn install
-              yarn tsc
-              yarn build
-              yarn export-local
-              INDEX_BASE64=$(base64 -w 0 deploy/index.json)
-              echo -n "io.backstage.dynamic-packages=$INDEX_BASE64" > "${SCRIPT_OUTPUT}"
+              ls -a
+
+              echo "test-annotation=worked"
+#              INDEX_BASE64=$(base64 -w 0 deploy/index.json)
+#              echo -n "io.backstage.dynamic-packages=$INDEX_BASE64" > "${SCRIPT_OUTPUT}"
           - name: HERMETIC
             value: $(params.hermetic)
           - name: SOURCE_ARTIFACT
@@ -256,6 +252,9 @@ spec:
           - name: kind
             value: task
           resolver: bundles
+        workspaces:
+          - name: git-basic-auth
+            workspace: git-auth
       - name: build-container
         params:
           - name: IMAGE
