@@ -227,8 +227,6 @@ spec:
             value: $(params.image-expires-after)
           - name: SCRIPT_RUNNER_IMAGE
             value: registry.redhat.io/rhel9/nodejs-20:latest
-          - name: SCRIPT_ARTIFACT_RELATIVE_PATH
-            value: deploy
           - name: SCRIPT
             value: |
               #!/bin/bash
@@ -252,9 +250,6 @@ spec:
           - name: kind
             value: task
           resolver: bundles
-        workspaces:
-          - name: build-plugins
-            workspace: build-plugins-ws
       - name: build-container
         params:
           - name: IMAGE
@@ -680,7 +675,5 @@ spec:
       secret:
         secretName: "{{ git_auth_secret }}"
     - name: backstage-manifest-data
-      emptyDir: {}
-    - name: build-plugins-ws
       emptyDir: {}
 status: {}
