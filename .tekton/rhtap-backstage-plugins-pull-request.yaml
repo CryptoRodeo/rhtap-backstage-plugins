@@ -230,13 +230,32 @@ spec:
           - name: SCRIPT
             value: |
               #!/bin/bash
-              ls -a
-              which dnf
-              which jq
-              which yarn
-              which node
-              which corepack
-              echo -n "io.backstage.dynamic-packages=test"
+              PLUGINS_OUTPUT="/plugin-output"
+              PLUGINS_WORKSPACE="/plugin-workspace"
+
+              dnf install -y jq
+
+              node --version && \
+              npm install -g corepack && \
+              corepack --version && \
+              corepack enable yarn && \
+              corepack use 'yarn@4' && \
+              yarn --version && \
+              mkdir -p $PLUGINS_OUTPUT
+
+              yarn plugins:prepare && \
+              yarn plugins:build
+
+              for plugin in $(ls ${PLUGINS_WORKSPACE}/plugins); do \
+                mv "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/index.json" "${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/${plugin}-index.json" && \
+                cp -R ${PLUGINS_WORKSPACE}/plugins/${plugin}/dist-plugin/* ${PLUGINS_OUTPUT}; \
+              done && \
+              jq -c -s 'flatten' ${PLUGINS_OUTPUT}/*-index.json > ${PLUGINS_OUTPUT}/index.json && \
+              rm -f ${PLUGINS_OUTPUT}/*-index.json
+
+              BASE64_HASH = $(base64 -w 0 ${PLUGINS_OUTPUT}/index.json)
+              echo $BASE64_HASH
+              echo -n "io.backstage.dynamic-packages=$BASE65_HASH"
           - name: HERMETIC
             value: $(params.hermetic)
           - name: SOURCE_ARTIFACT
